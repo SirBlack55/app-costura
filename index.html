@@ -150,6 +150,14 @@
 
             <div id="search-results" class="hidden space-y-2 max-h-72 overflow-y-auto rounded-[1.5rem]"></div>
 
+            <div id="quick-items-section" class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-extrabold text-slate-700 uppercase tracking-widest">Recientes</h2>
+                    <span class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Últimas 3</span>
+                </div>
+                <div id="quick-items" class="grid grid-cols-3 gap-2"></div>
+            </div>
+
             <div class="flex justify-between items-center pt-4">
                 <h2 class="text-xl font-extrabold text-slate-800">Cola de registro</h2>
                 <button onclick="clearDrafts()" class="text-[10px] text-slate-400 font-black uppercase tracking-widest px-3 py-1">Limpiar</button>
@@ -165,6 +173,36 @@
                 <input type="month" id="month-filter" onchange="updateView()" class="bg-slate-50 border-none rounded-xl p-2.5 text-sm font-bold text-indigo-600 outline-none" autocomplete="off">
             </div>
             
+            <div id="history-edit-panel" class="hidden bg-white p-5 rounded-[2rem] android-shadow border border-slate-100 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-extrabold text-slate-800">Editar registro</h3>
+                    <button onclick="cancelHistoryEdit()" class="text-slate-400 font-bold px-2 py-1">X</button>
+                </div>
+                <input type="hidden" id="history-edit-id" value="">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Prenda</label>
+                    <input type="text" id="history-edit-name" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none font-semibold" autocomplete="off">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Precio</label>
+                        <input type="text" id="history-edit-price" inputmode="decimal" class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold outline-none" autocomplete="off">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Cantidad</label>
+                        <input type="number" id="history-edit-qty" min="1" inputmode="numeric" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 text-slate-700 font-bold outline-none" autocomplete="off">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Fecha</label>
+                    <input type="datetime-local" id="history-edit-date" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 text-slate-700 font-bold outline-none" autocomplete="off">
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button onclick="saveHistoryEdit()" class="flex-1 bg-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-transform">GUARDAR CAMBIOS</button>
+                    <button onclick="cancelHistoryEdit()" class="bg-slate-100 text-slate-500 font-bold px-6 py-4 rounded-2xl">CANCELAR</button>
+                </div>
+            </div>
+
             <div id="history-grouped-list" class="space-y-8">
                 <!-- Los grupos de fecha se generarán aquí -->
             </div>
@@ -260,6 +298,15 @@
             });
         }
 
+        function parseQty(value) {
+            const qty = parseInt(value, 10);
+            return Number.isFinite(qty) && qty > 0 ? qty : 0;
+        }
+
+        function formatDateTimeLocal(date) {
+            return `${formatLocalDate(date)}T${padNumber(date.getHours())}:${padNumber(date.getMinutes())}`;
+        }
+
         function setKeyboardMode() {
             if (!window.visualViewport) return;
             const keyboardOpen = window.visualViewport.height < window.innerHeight * 0.8;
@@ -306,7 +353,10 @@
 
         function updateView() {
             const activeTab = document.querySelector('[id^="tab-"].text-indigo-600').id;
-            if (activeTab === 'tab-calculator') renderDrafts();
+            if (activeTab === 'tab-calculator') {
+                renderDrafts();
+                loadQuickItems();
+            }
             if (activeTab === 'tab-history') renderHistoryGrouped();
             if (activeTab === 'tab-inventory') loadManageList();
             calculateMonthlyTotal();
@@ -416,11 +466,42 @@
         function addDraft(id) {
             db.transaction("prendas").objectStore("prendas").get(id).onsuccess = (e) => {
                 const item = e.target.result;
-                drafts.push({ ...item, draftId: Date.now(), qty: 1 });
+                drafts.push({ ...item, draftId: Date.now(), qty: "" });
                 document.getElementById('search-input').value = "";
                 document.getElementById('search-results').classList.add('hidden');
                 renderDrafts();
             };
+        }
+
+        function loadQuickItems() {
+            const container = document.getElementById('quick-items');
+            const section = document.getElementById('quick-items-section');
+            if (!container || !section) return;
+
+            db.transaction("historial").objectStore("historial").getAll().onsuccess = (e) => {
+                const recentUnique = [];
+                const seen = new Set();
+                e.target.result
+                    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+                    .forEach(entry => {
+                        const key = `${entry.nombre}__${entry.precioUnitario}`;
+                        if (seen.has(key) || recentUnique.length >= 3) return;
+                        seen.add(key);
+                        recentUnique.push(entry);
+                    });
+
+                section.classList.toggle('hidden', recentUnique.length === 0);
+                container.innerHTML = recentUnique.map(item => `
+                    <button onclick="addQuickItem(decodeURIComponent('${encodeURIComponent(item.nombre)}'), ${Number(item.precioUnitario)})" class="w-full min-w-0 bg-white px-3 py-4 rounded-2xl android-shadow border border-slate-100 text-center active:bg-indigo-50">
+                        <p class="text-sm font-black text-slate-800 truncate">${escapeHtml(item.nombre)}</p>
+                    </button>
+                `).join('');
+            };
+        }
+
+        function addQuickItem(name, pricePts) {
+            drafts.push({ name, pricePts, draftId: Date.now(), qty: "" });
+            renderDrafts();
         }
 
         function renderDrafts() {
@@ -444,7 +525,7 @@
                     </div>
                     <div class="bg-slate-50 p-3 rounded-2xl mb-4">
                         <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 text-center">Cantidad</label>
-                        <input type="number" min="1" inputmode="numeric" oninput="updateDraft(${item.draftId}, 'qty', this.value)" value="${escapeHtml(item.qty)}" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">
+                        <input type="number" min="1" inputmode="numeric" oninput="updateDraft(${item.draftId}, 'qty', this.value)" value="${escapeHtml(item.qty)}" placeholder="0" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">
                     </div>
                     <button onclick="commitRecord(${item.draftId})" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-100">REGISTRAR</button>
                 </div>
@@ -464,6 +545,8 @@
             const item = drafts[index];
             const dateStr = document.getElementById('work-date').value;
             if (!dateStr) return alert("Selecciona fecha");
+            const cantidad = parseQty(item.qty);
+            if (cantidad < 1) return alert("Introduce una cantidad mayor que 0");
             
             const now = new Date();
             const date = new Date(dateStr);
@@ -472,14 +555,66 @@
             const entry = {
                 nombre: escapeHtml(item.name),
                 precioUnitario: item.pricePts,
-                cantidad: parseInt(item.qty) || 1,
-                totalPts: item.pricePts * (parseInt(item.qty) || 1),
+                cantidad,
+                totalPts: item.pricePts * cantidad,
                 fecha: date
             };
 
             const tx = db.transaction("historial", "readwrite");
             tx.objectStore("historial").add(entry);
-            tx.oncomplete = () => { drafts.splice(index, 1); renderDrafts(); calculateMonthlyTotal(); };
+            tx.oncomplete = () => { drafts.splice(index, 1); renderDrafts(); loadQuickItems(); calculateMonthlyTotal(); };
+        }
+
+        function editHistoryEntry(id) {
+            db.transaction("historial").objectStore("historial").get(id).onsuccess = (e) => {
+                const entry = e.target.result;
+                if (!entry) return;
+                document.getElementById('history-edit-id').value = entry.id;
+                document.getElementById('history-edit-name').value = entry.nombre;
+                document.getElementById('history-edit-price').value = formatPts(entry.precioUnitario);
+                document.getElementById('history-edit-qty').value = parseQty(entry.cantidad);
+                document.getElementById('history-edit-date').value = formatDateTimeLocal(new Date(entry.fecha));
+                document.getElementById('history-edit-panel').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+        }
+
+        function cancelHistoryEdit() {
+            document.getElementById('history-edit-id').value = "";
+            document.getElementById('history-edit-name').value = "";
+            document.getElementById('history-edit-price').value = "";
+            document.getElementById('history-edit-qty').value = "1";
+            document.getElementById('history-edit-date').value = "";
+            document.getElementById('history-edit-panel').classList.add('hidden');
+        }
+
+        function saveHistoryEdit() {
+            const id = parseInt(document.getElementById('history-edit-id').value, 10);
+            const nombre = document.getElementById('history-edit-name').value.trim();
+            const precioUnitario = parsePrice(document.getElementById('history-edit-price').value);
+            const cantidad = parseQty(document.getElementById('history-edit-qty').value);
+            const rawDate = document.getElementById('history-edit-date').value;
+            if (!id || !nombre || isNaN(precioUnitario) || precioUnitario < 0 || !rawDate) {
+                return alert("Revisa prenda, precio, cantidad y fecha");
+            }
+
+            const fecha = new Date(rawDate);
+            const entry = {
+                id,
+                nombre: escapeHtml(nombre),
+                precioUnitario,
+                cantidad,
+                totalPts: precioUnitario * cantidad,
+                fecha
+            };
+
+            const tx = db.transaction("historial", "readwrite");
+            tx.objectStore("historial").put(entry);
+            tx.oncomplete = () => {
+                cancelHistoryEdit();
+                renderHistoryGrouped();
+                calculateMonthlyTotal();
+            };
         }
 
         // --- HISTORIAL AGRUPADO ---
@@ -530,6 +665,9 @@
                                             <p class="text-base font-black text-emerald-500">${escapeHtml(formatPts(entry.totalPts))} pts</p>
                                             <p class="text-[9px] text-slate-300 font-bold uppercase">${escapeHtml(new Date(entry.fecha).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}))}</p>
                                         </div>
+                                        <button onclick="editHistoryEntry(${entry.id})" class="text-slate-300 active:text-indigo-500 p-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                        </button>
                                         <button onclick="deleteHistoryEntry(${entry.id})" class="text-slate-200 active:text-rose-400 p-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                         </button>

@@ -184,7 +184,7 @@
 
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Precio Unitario (Pesetas)</label>
-                        <input type="number" id="input-price" min="0" step="1" inputmode="numeric" oninput="updateEuroPreview(this.value)" class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold text-xl outline-none" autocomplete="off">
+                        <input type="text" id="input-price" inputmode="decimal" oninput="updateEuroPreview(this.value)" class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold text-xl outline-none" autocomplete="off">
                         <p id="euro-preview" class="mt-2 text-sm text-indigo-400 font-medium italic">≈ 0,00 €</p>
                     </div>
                 </div>
@@ -241,6 +241,23 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#39;");
+        }
+
+        function parsePrice(value) {
+            if (typeof value === 'number') return Number.isFinite(value) ? value : NaN;
+            const normalized = String(value ?? "").trim().replace(/\s+/g, '').replace(',', '.');
+            if (!normalized) return NaN;
+            const parsed = Number(normalized);
+            return Number.isFinite(parsed) ? parsed : NaN;
+        }
+
+        function formatPts(value) {
+            const price = parsePrice(value);
+            if (isNaN(price)) return '0';
+            return price.toLocaleString('es-ES', {
+                minimumFractionDigits: Number.isInteger(price) ? 0 : 1,
+                maximumFractionDigits: 2
+            });
         }
 
         function setKeyboardMode() {
@@ -302,9 +319,9 @@
         // --- GESTIÓN DE PRENDAS ---
         function saveItem() {
             const id = document.getElementById('edit-id').value;
-            const name = document.getElementById('input-name').value;
-            const pricePts = parseInt(document.getElementById('input-price').value);
-            if (!name || isNaN(pricePts)) return alert("Rellena tipo de prenda y precio");
+            const name = document.getElementById('input-name').value.trim();
+            const pricePts = parsePrice(document.getElementById('input-price').value);
+            if (!name || isNaN(pricePts) || pricePts < 0) return alert("Rellena tipo de prenda y precio");
             const tx = db.transaction("prendas", "readwrite");
             const item = { name, pricePts };
             if (id) item.id = parseInt(id);
@@ -322,7 +339,7 @@
                     div.innerHTML = `
                         <div class="truncate">
                             <p class="font-bold text-slate-800">${escapeHtml(item.name)}</p>
-                            <p class="text-sm font-black text-indigo-600 mt-1">${escapeHtml(item.pricePts)} pts</p>
+                            <p class="text-sm font-black text-indigo-600 mt-1">${escapeHtml(formatPts(item.pricePts))} pts</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="editItem(${item.id})" class="p-3 bg-slate-50 text-slate-400 rounded-xl active:bg-indigo-50 active:text-indigo-600">
@@ -344,7 +361,7 @@
                 document.getElementById('form-title').innerText = "Editando Prenda";
                 document.getElementById('edit-id').value = item.id;
                 document.getElementById('input-name').value = item.name;
-                document.getElementById('input-price').value = item.pricePts;
+                document.getElementById('input-price').value = formatPts(item.pricePts);
                 document.getElementById('btn-save').innerText = "ACTUALIZAR";
                 document.getElementById('btn-cancel').classList.remove('hidden');
                 updateEuroPreview(item.pricePts);
@@ -374,7 +391,7 @@
         }
 
         function updateEuroPreview(pts) {
-            const euro = (parseFloat(pts) || 0) / EURO_CONVERSION;
+            const euro = (parsePrice(pts) || 0) / EURO_CONVERSION;
             document.getElementById('euro-preview').innerText = `≈ ${euro.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €`;
         }
 
@@ -390,7 +407,7 @@
                         <div>
                             <p class="text-sm font-bold text-slate-800">${escapeHtml(item.name)}</p>
                         </div>
-                        <p class="text-sm font-black text-indigo-600">${escapeHtml(item.pricePts)} pts</p>
+                        <p class="text-sm font-black text-indigo-600">${escapeHtml(formatPts(item.pricePts))} pts</p>
                     </div>
                 `).join('');
             };
@@ -419,7 +436,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <h3 class="font-black text-slate-800 text-lg leading-tight">${escapeHtml(item.name)}</h3>
-                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">${escapeHtml(item.pricePts)} pts</p>
+                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">${escapeHtml(formatPts(item.pricePts))} pts</p>
                         </div>
                         <button onclick="removeDraft(${item.draftId})" class="bg-slate-50 p-2 rounded-xl text-slate-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -504,13 +521,13 @@
                                             <h4 class="font-bold text-slate-800">${escapeHtml(entry.nombre)}</h4>
                                         </div>
                                         <p class="text-[10px] text-slate-400 font-bold mt-1">
-                                            PRECIO <span class="text-slate-600">${escapeHtml(entry.precioUnitario)} pts</span> •
+                                            PRECIO <span class="text-slate-600">${escapeHtml(formatPts(entry.precioUnitario))} pts</span> •
                                             CANT <span class="text-slate-600">${escapeHtml(entry.cantidad || 1)}</span>
                                         </p>
                                     </div>
                                     <div class="text-right flex items-center gap-4">
                                         <div>
-                                            <p class="text-base font-black text-emerald-500">${escapeHtml(entry.totalPts)} pts</p>
+                                            <p class="text-base font-black text-emerald-500">${escapeHtml(formatPts(entry.totalPts))} pts</p>
                                             <p class="text-[9px] text-slate-300 font-bold uppercase">${escapeHtml(new Date(entry.fecha).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}))}</p>
                                         </div>
                                         <button onclick="deleteHistoryEntry(${entry.id})" class="text-slate-200 active:text-rose-400 p-1">
@@ -540,7 +557,7 @@
                     .filter(entry => formatLocalMonth(new Date(entry.fecha)) === monthVal)
                     .reduce((sum, entry) => sum + entry.totalPts, 0);
                 const totalEur = totalPts / EURO_CONVERSION;
-                document.getElementById('total-price-pts').innerText = totalPts.toLocaleString('es-ES') + ' pts';
+                document.getElementById('total-price-pts').innerText = formatPts(totalPts) + ' pts';
                 document.getElementById('total-price-eur').innerText = totalEur.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + '€';
                 const [year, month] = monthVal.split('-');
                 const monthName = new Date(year, month-1).toLocaleString('es-ES', { month: 'long' });

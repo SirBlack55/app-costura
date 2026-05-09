@@ -399,7 +399,7 @@
         function addDraft(id) {
             db.transaction("prendas").objectStore("prendas").get(id).onsuccess = (e) => {
                 const item = e.target.result;
-                drafts.push({ ...item, draftId: Date.now() });
+                drafts.push({ ...item, draftId: Date.now(), qty: 1 });
                 document.getElementById('search-input').value = "";
                 document.getElementById('search-results').classList.add('hidden');
                 renderDrafts();
@@ -425,9 +425,18 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl mb-4">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 text-center">Cantidad</label>
+                        <input type="number" min="1" inputmode="numeric" oninput="updateDraft(${item.draftId}, 'qty', this.value)" value="${escapeHtml(item.qty)}" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">
+                    </div>
                     <button onclick="commitRecord(${item.draftId})" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-100">REGISTRAR</button>
                 </div>
             `).join('');
+        }
+
+        function updateDraft(id, field, value) {
+            const draft = drafts.find(x => x.draftId === id);
+            if (draft) draft[field] = value;
         }
 
         function removeDraft(id) { drafts = drafts.filter(x => x.draftId !== id); renderDrafts(); }
@@ -446,7 +455,8 @@
             const entry = {
                 nombre: escapeHtml(item.name),
                 precioUnitario: item.pricePts,
-                totalPts: item.pricePts,
+                cantidad: parseInt(item.qty) || 1,
+                totalPts: item.pricePts * (parseInt(item.qty) || 1),
                 fecha: date
             };
 
@@ -494,7 +504,8 @@
                                             <h4 class="font-bold text-slate-800">${escapeHtml(entry.nombre)}</h4>
                                         </div>
                                         <p class="text-[10px] text-slate-400 font-bold mt-1">
-                                            PRECIO <span class="text-slate-600">${escapeHtml(entry.precioUnitario)} pts</span>
+                                            PRECIO <span class="text-slate-600">${escapeHtml(entry.precioUnitario)} pts</span> •
+                                            CANT <span class="text-slate-600">${escapeHtml(entry.cantidad || 1)}</span>
                                         </p>
                                     </div>
                                     <div class="text-right flex items-center gap-4">

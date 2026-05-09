@@ -2,21 +2,36 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Produccion">
     <title>Registro de Ropa - Xiaomi 11</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%234f46e5'/%3E%3Cpath d='M20 18h24v8H20zm2 10h20v18H22z' fill='white'/%3E%3Cpath d='M28 18v28M36 18v28' stroke='%234f46e5' stroke-width='3'/%3E%3C/svg%3E">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        
+        :root {
+            color-scheme: light;
+        }
         
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
             -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
         }
 
         .android-shadow {
             box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top);
         }
 
         .safe-area-bottom {
@@ -40,6 +55,12 @@
             visibility: hidden;
             pointer-events: none;
         }
+
+        body.keyboard-open #total-footer {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(110%);
+        }
         
         /* Estilo para los divisores de fecha en el historial */
         .date-header {
@@ -54,7 +75,7 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-indigo-600 text-white p-6 rounded-b-[2.5rem] android-shadow flex justify-between items-center">
+    <header class="bg-indigo-600 text-white p-6 rounded-b-[2.5rem] android-shadow flex justify-between items-center safe-area-top">
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">Producción</h1>
             <p id="header-subtitle" class="text-indigo-100 text-xs font-medium uppercase tracking-wider">Cargando...</p>
@@ -117,7 +138,7 @@
         <section id="view-calculator" class="space-y-5">
             <div class="bg-indigo-600 p-5 rounded-[2rem] shadow-xl shadow-indigo-200">
                 <label class="text-[10px] font-black text-indigo-200 uppercase tracking-[0.2em] block mb-2 ml-1">Fecha de trabajo</label>
-                <input type="date" id="work-date" class="w-full bg-indigo-500/50 border border-indigo-400/30 rounded-2xl p-4 text-lg font-bold text-white outline-none focus:bg-indigo-500">
+                <input type="date" id="work-date" class="w-full bg-indigo-500/50 border border-indigo-400/30 rounded-2xl p-4 text-lg font-bold text-white outline-none focus:bg-indigo-500" autocomplete="off">
             </div>
 
             <div class="relative">
@@ -141,7 +162,7 @@
         <section id="view-history" class="hidden space-y-6">
             <div class="flex items-center justify-between bg-white p-4 rounded-3xl android-shadow border border-slate-100">
                 <span class="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Mes de consulta</span>
-                <input type="month" id="month-filter" onchange="updateView()" class="bg-slate-50 border-none rounded-xl p-2.5 text-sm font-bold text-indigo-600 outline-none">
+                <input type="month" id="month-filter" onchange="updateView()" class="bg-slate-50 border-none rounded-xl p-2.5 text-sm font-bold text-indigo-600 outline-none" autocomplete="off">
             </div>
             
             <div id="history-grouped-list" class="space-y-8">
@@ -158,17 +179,17 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nombre</label>
-                        <input type="text" id="input-name" placeholder="Ej: Polo Azul" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                        <input type="text" id="input-name" placeholder="Ej: Polo Azul" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold" autocomplete="off" autocapitalize="words">
                     </div>
 
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Categoría</label>
-                        <input type="text" id="input-category" placeholder="Ej: Invierno" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                        <input type="text" id="input-category" placeholder="Ej: Invierno" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold" autocomplete="off" autocapitalize="words">
                     </div>
 
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Precio Unitario (Pesetas)</label>
-                        <input type="number" id="input-price" min="0" step="1" oninput="updateEuroPreview(this.value)" class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold text-xl outline-none">
+                        <input type="number" id="input-price" min="0" step="1" inputmode="numeric" oninput="updateEuroPreview(this.value)" class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold text-xl outline-none" autocomplete="off">
                         <p id="euro-preview" class="mt-2 text-sm text-indigo-400 font-medium italic">≈ 0,00 €</p>
                     </div>
                 </div>
@@ -206,6 +227,42 @@
         let db;
         let drafts = [];
 
+        function padNumber(value) {
+            return String(value).padStart(2, '0');
+        }
+
+        function formatLocalDate(date) {
+            return `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`;
+        }
+
+        function formatLocalMonth(date) {
+            return `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}`;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function setKeyboardMode() {
+            if (!window.visualViewport) return;
+            const keyboardOpen = window.visualViewport.height < window.innerHeight * 0.8;
+            document.body.classList.toggle('keyboard-open', keyboardOpen);
+        }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', setKeyboardMode);
+            window.visualViewport.addEventListener('scroll', setKeyboardMode);
+        }
+        window.addEventListener('focusin', setKeyboardMode);
+        window.addEventListener('focusout', () => {
+            window.setTimeout(setKeyboardMode, 50);
+        });
+
         // Inicializar IndexedDB
         const request = indexedDB.open("ArmarioDB", 3);
 
@@ -218,8 +275,10 @@
         request.onsuccess = (event) => {
             db = event.target.result;
             const now = new Date();
-            document.getElementById('month-filter').value = now.toISOString().slice(0, 7);
-            document.getElementById('work-date').value = now.toISOString().slice(0, 10);
+            document.getElementById('month-filter').value = formatLocalMonth(now);
+            document.getElementById('work-date').value = formatLocalDate(now);
+            document.body.classList.toggle('standalone-mode', window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true);
+            setKeyboardMode();
             updateView();
         };
 
@@ -268,9 +327,9 @@
                     div.className = "bg-white p-4 rounded-2xl android-shadow flex justify-between items-center mb-3 border border-slate-50 fade-in";
                     div.innerHTML = `
                         <div class="truncate">
-                            <p class="font-bold text-slate-800">${item.name}</p>
-                            <p class="text-[9px] text-indigo-400 font-black uppercase tracking-widest">${item.category || 'General'}</p>
-                            <p class="text-sm font-black text-indigo-600 mt-1">${item.pricePts} pts</p>
+                            <p class="font-bold text-slate-800">${escapeHtml(item.name)}</p>
+                            <p class="text-[9px] text-indigo-400 font-black uppercase tracking-widest">${escapeHtml(item.category || 'General')}</p>
+                            <p class="text-sm font-black text-indigo-600 mt-1">${escapeHtml(item.pricePts)} pts</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="editItem(${item.id})" class="p-3 bg-slate-50 text-slate-400 rounded-xl active:bg-indigo-50 active:text-indigo-600">
@@ -324,10 +383,10 @@
                 resultsDiv.innerHTML = filtered.map(item => `
                     <div onclick="addDraft(${item.id})" class="bg-white p-4 border-b border-slate-50 flex justify-between items-center active:bg-indigo-50">
                         <div>
-                            <p class="text-sm font-bold text-slate-800">${item.name}</p>
-                            <p class="text-[9px] text-indigo-400 font-black uppercase tracking-widest">${item.category || 'General'}</p>
+                            <p class="text-sm font-bold text-slate-800">${escapeHtml(item.name)}</p>
+                            <p class="text-[9px] text-indigo-400 font-black uppercase tracking-widest">${escapeHtml(item.category || 'General')}</p>
                         </div>
-                        <p class="text-sm font-black text-indigo-600">${item.pricePts} pts</p>
+                        <p class="text-sm font-black text-indigo-600">${escapeHtml(item.pricePts)} pts</p>
                     </div>
                 `).join('');
             };
@@ -355,8 +414,8 @@
                 <div class="bg-white p-5 rounded-[2rem] android-shadow border-l-[6px] border-indigo-500 fade-in">
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <h3 class="font-black text-slate-800 text-lg leading-tight">${item.name}</h3>
-                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">${item.pricePts} pts / unidad</p>
+                            <h3 class="font-black text-slate-800 text-lg leading-tight">${escapeHtml(item.name)}</h3>
+                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">${escapeHtml(item.pricePts)} pts / unidad</p>
                         </div>
                         <button onclick="removeDraft(${item.draftId})" class="bg-slate-50 p-2 rounded-xl text-slate-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -365,11 +424,11 @@
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="bg-slate-50 p-3 rounded-2xl">
                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Talla</label>
-                            <input type="text" placeholder="Ej: XL" oninput="updateDraft(${item.draftId}, 'selectedSize', this.value)" value="${item.selectedSize}" class="w-full bg-transparent p-0 text-sm font-bold text-slate-700 outline-none">
+                            <input type="text" placeholder="Ej: XL" oninput="updateDraft(${item.draftId}, 'selectedSize', this.value)" value="${escapeHtml(item.selectedSize)}" class="w-full bg-transparent p-0 text-sm font-bold text-slate-700 outline-none" autocomplete="off" autocapitalize="characters">
                         </div>
                         <div class="bg-slate-50 p-3 rounded-2xl">
                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 text-center">Cantidad</label>
-                            <input type="number" min="1" oninput="updateDraft(${item.draftId}, 'qty', this.value)" value="${item.qty}" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center">
+                            <input type="number" min="1" inputmode="numeric" oninput="updateDraft(${item.draftId}, 'qty', this.value)" value="${escapeHtml(item.qty)}" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">
                         </div>
                     </div>
                     <button onclick="commitRecord(${item.draftId})" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-100">REGISTRAR</button>
@@ -392,9 +451,9 @@
             date.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
 
             const entry = {
-                nombre: item.name,
+                nombre: escapeHtml(item.name),
                 precioUnitario: item.pricePts,
-                talla: item.selectedSize || "-",
+                talla: escapeHtml(item.selectedSize || "-"),
                 cantidad: parseInt(item.qty) || 1,
                 totalPts: item.pricePts * (parseInt(item.qty) || 1),
                 fecha: date
@@ -412,7 +471,7 @@
             
             const monthVal = document.getElementById('month-filter').value; 
             db.transaction("historial").objectStore("historial").getAll().onsuccess = (e) => {
-                const filtered = e.target.result.filter(entry => new Date(entry.fecha).toISOString().slice(0, 7) === monthVal)
+                const filtered = e.target.result.filter(entry => formatLocalMonth(new Date(entry.fecha)) === monthVal)
                                   .sort((a, b) => b.fecha - a.fecha);
 
                 if (filtered.length === 0) {
@@ -434,14 +493,14 @@
                 container.innerHTML = Object.keys(groups).map(dateTitle => `
                     <div class="space-y-4">
                         <div class="date-header py-2">
-                            <h3 class="text-sm font-black text-indigo-600 uppercase tracking-widest pl-2 border-l-4 border-indigo-500">${dateTitle}</h3>
+                            <h3 class="text-sm font-black text-indigo-600 uppercase tracking-widest pl-2 border-l-4 border-indigo-500">${escapeHtml(dateTitle)}</h3>
                         </div>
                         <div class="space-y-3">
                             ${groups[dateTitle].map(entry => `
                                 <div class="bg-white p-4 rounded-2xl android-shadow border border-slate-50 flex justify-between items-center fade-in">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
-                                            <h4 class="font-bold text-slate-800">${entry.nombre}</h4>
+                                            <h4 class="font-bold text-slate-800">${escapeHtml(entry.nombre)}</h4>
                                         </div>
                                         <p class="text-[10px] text-slate-400 font-bold mt-1">
                                             TALLA <span class="text-slate-600">${entry.talla}</span> • 
@@ -450,8 +509,8 @@
                                     </div>
                                     <div class="text-right flex items-center gap-4">
                                         <div>
-                                            <p class="text-base font-black text-emerald-500">${entry.totalPts} pts</p>
-                                            <p class="text-[9px] text-slate-300 font-bold uppercase">${new Date(entry.fecha).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'})}</p>
+                                            <p class="text-base font-black text-emerald-500">${escapeHtml(entry.totalPts)} pts</p>
+                                            <p class="text-[9px] text-slate-300 font-bold uppercase">${escapeHtml(new Date(entry.fecha).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}))}</p>
                                         </div>
                                         <button onclick="deleteHistoryEntry(${entry.id})" class="text-slate-200 active:text-rose-400 p-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
@@ -477,7 +536,7 @@
             const monthVal = document.getElementById('month-filter').value;
             db.transaction("historial").objectStore("historial").getAll().onsuccess = (e) => {
                 const totalPts = e.target.result
-                    .filter(entry => new Date(entry.fecha).toISOString().slice(0, 7) === monthVal)
+                    .filter(entry => formatLocalMonth(new Date(entry.fecha)) === monthVal)
                     .reduce((sum, entry) => sum + entry.totalPts, 0);
                 const totalEur = totalPts / EURO_CONVERSION;
                 document.getElementById('total-price-pts').innerText = totalPts.toLocaleString('es-ES') + ' pts';
@@ -510,8 +569,9 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = `armario_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `armario_backup_${formatLocalDate(new Date())}.json`;
                 a.click();
+                URL.revokeObjectURL(url);
             });
         }
 

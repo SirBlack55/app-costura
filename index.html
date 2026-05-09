@@ -142,7 +142,7 @@
             </div>
 
             <div class="relative">
-                <input type="text" id="search-input" oninput="searchItems(this.value)" placeholder="Buscar prenda por nombre..." class="w-full p-5 pl-14 bg-white border-none rounded-[1.5rem] android-shadow focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700">
+                <input type="text" id="search-input" oninput="searchItems(this.value)" placeholder="Buscar tipo de prenda..." class="w-full p-5 pl-14 bg-white border-none rounded-[1.5rem] android-shadow focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-5 top-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -178,13 +178,8 @@
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nombre</label>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Tipo de prenda</label>
                         <input type="text" id="input-name" placeholder="Ej: Polo Azul" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold" autocomplete="off" autocapitalize="words">
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Categoría</label>
-                        <input type="text" id="input-category" placeholder="Ej: Invierno" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold" autocomplete="off" autocapitalize="words">
                     </div>
 
                     <div>
@@ -308,11 +303,10 @@
         function saveItem() {
             const id = document.getElementById('edit-id').value;
             const name = document.getElementById('input-name').value;
-            const category = document.getElementById('input-category').value;
             const pricePts = parseInt(document.getElementById('input-price').value);
-            if (!name || isNaN(pricePts)) return alert("Rellena nombre y precio");
+            if (!name || isNaN(pricePts)) return alert("Rellena tipo de prenda y precio");
             const tx = db.transaction("prendas", "readwrite");
-            const item = { name, category, pricePts };
+            const item = { name, pricePts };
             if (id) item.id = parseInt(id);
             tx.objectStore("prendas").put(item);
             tx.oncomplete = () => { resetForm(); loadManageList(); };
@@ -328,7 +322,6 @@
                     div.innerHTML = `
                         <div class="truncate">
                             <p class="font-bold text-slate-800">${escapeHtml(item.name)}</p>
-                            <p class="text-[9px] text-indigo-400 font-black uppercase tracking-widest">${escapeHtml(item.category || 'General')}</p>
                             <p class="text-sm font-black text-indigo-600 mt-1">${escapeHtml(item.pricePts)} pts</p>
                         </div>
                         <div class="flex gap-2">
@@ -348,7 +341,6 @@
                 document.getElementById('form-title').innerText = "Editando Prenda";
                 document.getElementById('edit-id').value = item.id;
                 document.getElementById('input-name').value = item.name;
-                document.getElementById('input-category').value = item.category;
                 document.getElementById('input-price').value = item.pricePts;
                 document.getElementById('btn-save').innerText = "ACTUALIZAR";
                 document.getElementById('btn-cancel').classList.remove('hidden');
@@ -361,7 +353,6 @@
             document.getElementById('form-title').innerText = "Nueva Prenda";
             document.getElementById('edit-id').value = "";
             document.getElementById('input-name').value = "";
-            document.getElementById('input-category').value = "";
             document.getElementById('input-price').value = "";
             document.getElementById('euro-preview').innerText = "≈ 0,00 €";
             document.getElementById('btn-save').innerText = "GUARDAR";
@@ -384,7 +375,6 @@
                     <div onclick="addDraft(${item.id})" class="bg-white p-4 border-b border-slate-50 flex justify-between items-center active:bg-indigo-50">
                         <div>
                             <p class="text-sm font-bold text-slate-800">${escapeHtml(item.name)}</p>
-                            <p class="text-[9px] text-indigo-400 font-black uppercase tracking-widest">${escapeHtml(item.category || 'General')}</p>
                         </div>
                         <p class="text-sm font-black text-indigo-600">${escapeHtml(item.pricePts)} pts</p>
                     </div>
@@ -395,7 +385,7 @@
         function addDraft(id) {
             db.transaction("prendas").objectStore("prendas").get(id).onsuccess = (e) => {
                 const item = e.target.result;
-                drafts.push({ ...item, draftId: Date.now(), qty: 1, selectedSize: "" });
+                drafts.push({ ...item, draftId: Date.now() });
                 document.getElementById('search-input').value = "";
                 document.getElementById('search-results').classList.add('hidden');
                 renderDrafts();
@@ -406,7 +396,7 @@
             const container = document.getElementById('calculator-drafts');
             if (drafts.length === 0) {
                 container.innerHTML = `<div class="text-center py-12 px-6 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem]">
-                    <p class="text-slate-400 text-sm font-medium italic">Busca prendas arriba para empezar a registrar tu trabajo</p>
+                    <p class="text-slate-400 text-sm font-medium italic">Busca un tipo de prenda arriba para empezar a registrar</p>
                 </div>`;
                 return;
             }
@@ -415,28 +405,17 @@
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <h3 class="font-black text-slate-800 text-lg leading-tight">${escapeHtml(item.name)}</h3>
-                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">${escapeHtml(item.pricePts)} pts / unidad</p>
+                            <p class="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-0.5">${escapeHtml(item.pricePts)} pts</p>
                         </div>
                         <button onclick="removeDraft(${item.draftId})" class="bg-slate-50 p-2 rounded-xl text-slate-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="bg-slate-50 p-3 rounded-2xl">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Talla</label>
-                            <input type="text" placeholder="Ej: XL" oninput="updateDraft(${item.draftId}, 'selectedSize', this.value)" value="${escapeHtml(item.selectedSize)}" class="w-full bg-transparent p-0 text-sm font-bold text-slate-700 outline-none" autocomplete="off" autocapitalize="characters">
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-2xl">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 text-center">Cantidad</label>
-                            <input type="number" min="1" inputmode="numeric" oninput="updateDraft(${item.draftId}, 'qty', this.value)" value="${escapeHtml(item.qty)}" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">
-                        </div>
                     </div>
                     <button onclick="commitRecord(${item.draftId})" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-100">REGISTRAR</button>
                 </div>
             `).join('');
         }
 
-        function updateDraft(id, f, v) { const d = drafts.find(x => x.draftId === id); if(d) d[f] = v; }
         function removeDraft(id) { drafts = drafts.filter(x => x.draftId !== id); renderDrafts(); }
         function clearDrafts() { drafts = []; renderDrafts(); }
 
@@ -453,9 +432,7 @@
             const entry = {
                 nombre: escapeHtml(item.name),
                 precioUnitario: item.pricePts,
-                talla: escapeHtml(item.selectedSize || "-"),
-                cantidad: parseInt(item.qty) || 1,
-                totalPts: item.pricePts * (parseInt(item.qty) || 1),
+                totalPts: item.pricePts,
                 fecha: date
             };
 
@@ -503,8 +480,7 @@
                                             <h4 class="font-bold text-slate-800">${escapeHtml(entry.nombre)}</h4>
                                         </div>
                                         <p class="text-[10px] text-slate-400 font-bold mt-1">
-                                            TALLA <span class="text-slate-600">${entry.talla}</span> • 
-                                            CANT <span class="text-slate-600">${entry.cantidad}</span>
+                                            PRECIO <span class="text-slate-600">${escapeHtml(entry.precioUnitario)} pts</span>
                                         </p>
                                     </div>
                                     <div class="text-right flex items-center gap-4">

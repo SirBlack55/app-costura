@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Armario - Xiaomi 11</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .android-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.2s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-empty {
+            border-color: #fbbf24 !important;
+            background-color: #fffbeb !important;
+        }
+
+        /* Estilos para el Modal de Ajustes */
+        #settings-modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        #settings-content {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .modal-hidden #settings-content {
+            transform: translateY(20px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white p-6 rounded-b-3xl android-shadow flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold">Mi Inventario</h1>
+            <p class="text-indigo-100 text-sm">Optimizado para Xiaomi 11</p>
+        </div>
+        <button onclick="toggleSettings(true)" class="p-2 bg-indigo-500 rounded-full active:scale-90 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        </button>
+    </header>
+
+    <!-- Modal de Ajustes -->
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 modal-hidden" onclick="toggleSettings(false)">
+        <div id="settings-content" class="bg-white w-full max-w-sm rounded-3xl p-6 android-shadow" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Ajustes</h2>
+                <button onclick="toggleSettings(false)" class="text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="p-4 bg-indigo-50 rounded-2xl">
+                    <h3 class="text-sm font-bold text-indigo-600 uppercase mb-2">Copia de Seguridad</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button onclick="exportData()" class="flex items-center justify-center gap-2 w-full py-3 bg-white border border-indigo-200 text-indigo-600 rounded-xl font-bold active:bg-indigo-100 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Exportar Inventario (.json)
+                        </button>
+                        
+                        <label class="flex items-center justify-center gap-2 w-full py-3 bg-indigo-600 text-white rounded-xl font-bold active:bg-indigo-700 cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Importar Inventario
+                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+                        </label>
+                    </div>
+                </div>
+                
+                <p class="text-[10px] text-gray-400 text-center uppercase font-bold tracking-widest">Versión 2.1 - Xiaomi 11 Edition</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 pb-44">
+        
+        <!-- Tabs -->
+        <div class="flex bg-gray-200 p-1 rounded-xl mb-6">
+            <button id="tab-calculator" onclick="switchTab('calculator')" class="flex-1 py-2 rounded-lg font-medium bg-white shadow-sm text-indigo-600">Calculadora</button>
+            <button id="tab-inventory" onclick="switchTab('inventory')" class="flex-1 py-2 rounded-lg font-medium text-gray-500">Gestión</button>
+        </div>
+
+        <!-- Seccion: Calculadora -->
+        <section id="view-calculator" class="space-y-4">
+            
+            <!-- Buscador -->
+            <div class="relative">
+                <input type="text" id="search-input" oninput="searchItems(this.value)" placeholder="Buscar por nombre, tipo o talla..." class="w-full p-4 pl-12 bg-white border-none rounded-2xl android-shadow focus:ring-2 focus:ring-indigo-500 outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-4 top-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+
+            <!-- Resultados de búsqueda -->
+            <div id="search-results" class="hidden space-y-2 max-h-64 overflow-y-auto p-1"></div>
+
+            <div class="flex justify-between items-center mt-6 mb-2">
+                <h2 class="text-lg font-bold text-gray-800 tracking-tight">Prendas en la cuenta</h2>
+                <button onclick="clearCalculator()" class="text-xs text-red-500 font-bold uppercase tracking-wide px-2 py-1">Vaciar</button>
+            </div>
+            
+            <!-- Carrito dinámico -->
+            <div id="calculator-cart" class="grid grid-cols-1 gap-3"></div>
+        </section>
+
+        <!-- Seccion: Gestión -->
+        <section id="view-inventory" class="hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl android-shadow space-y-4">
+                <h2 id="form-title" class="text-lg font-bold border-b pb-2">Nueva Prenda</h2>
+                <input type="hidden" id="edit-id" value="">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre / Prenda</label>
+                    <input type="text" id="input-name" placeholder="Ej: Camiseta Básica" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo / Categoría</label>
+                        <input type="text" id="input-category" placeholder="Ej: Verano" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Talla</label>
+                        <input type="text" id="input-size" placeholder="Ej: L, 42" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Precio (Pesetas)</label>
+                    <input type="number" id="input-price" min="0" step="1" placeholder="0" oninput="updateEuroPreview(this.value)" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
+                    <p id="euro-preview" class="mt-1 text-sm text-indigo-500 font-medium italic">≈ 0.00 €</p>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-save" onclick="saveItem()" class="flex-1 bg-indigo-600 text-white font-bold py-4 rounded-xl active:bg-indigo-700">
+                        Guardar en Inventario
+                    </button>
+                    <button id="btn-cancel" onclick="resetForm()" class="hidden bg-gray-200 text-gray-600 font-bold px-4 py-4 rounded-xl active:bg-gray-300 text-xs uppercase">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-8 pb-10">
+                <h2 class="text-lg font-bold mb-3">Tu Inventario</h2>
+                <div id="manage-list" class="space-y-2"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Total Footer -->
+    <footer id="total-footer" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-5 rounded-t-3xl shadow-[0_-8px_20px_rgba(0,0,0,0.1)] safe-area-bottom">
+        <div class="max-w-md mx-auto grid grid-cols-2 gap-4">
+            <div>
+                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Total Pts</p>
+                <p id="total-price-pts" class="text-2xl font-black text-indigo-600">0 pts</p>
+            </div>
+            <div class="text-right border-l pl-4 border-gray-100">
+                <p class="text-gray-500 text-[10px] font-bold uppercase tracking-widest">Total Euros</p>
+                <p id="total-price-eur" class="text-2xl font-black text-emerald-600">0,00€</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const EURO_CONVERSION = 166.386;
+        let db;
+        let selectedItems = new Map(); 
+
+        const request = indexedDB.open("ArmarioDB", 2);
+
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+            if (!db.objectStoreNames.contains("prendas")) {
+                db.createObjectStore("prendas", { keyPath: "id", autoIncrement: true });
+            }
+        };
+
+        request.onsuccess = (event) => {
+            db = event.target.result;
+            renderCalculator();
+        };
+
+        function toggleSettings(show) {
+            const modal = document.getElementById('settings-modal');
+            if (show) modal.classList.remove('modal-hidden');
+            else modal.classList.add('modal-hidden');
+        }
+
+        // --- EXPORTAR / IMPORTAR ---
+        function exportData() {
+            const transaction = db.transaction(["prendas"], "readonly");
+            const store = transaction.objectStore("prendas");
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const data = JSON.stringify(request.result, null, 2);
+                const blob = new Blob([data], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                const date = new Date().toISOString().slice(0, 10);
+                a.href = url;
+                a.download = `inventario_ropa_${date}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) throw new Error("Formato inválido");
+
+                    const transaction = db.transaction(["prendas"], "readwrite");
+                    const store = transaction.objectStore("prendas");
+
+                    data.forEach(item => {
+                        // Eliminamos el ID para que IndexedDB genere nuevos si hay conflicto
+                        // o lo mantenemos si queremos sobrescribir. Aquí optamos por añadir.
+                        delete item.id; 
+                        store.add(item);
+                    });
+
+                    transaction.oncomplete = () => {
+                        alert("Datos importados con éxito");
+                        loadManageList();
+                        toggleSettings(false);
+                    };
+                } catch (err) {
+                    alert("Error al importar: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- NAVEGACIÓN Y CALCULADORA ---
+        function switchTab(tab) {
+            const calcView = document.getElementById('view-calculator');
+            const invView = document.getElementById('view-inventory');
+            const calcTab = document.getElementById('tab-calculator');
+            const invTab = document.getElementById('tab-inventory');
+            const footer = document.getElementById('total-footer');
+
+            if (tab === 'calculator') {
+                calcView.classList.remove('hidden');
+                invView.classList.add('hidden');
+                calcTab.className = "flex-1 py-2 rounded-lg font-medium bg-white shadow-sm text-indigo-600";
+                invTab.className = "flex-1 py-2 rounded-lg font-medium text-gray-500";
+                footer.classList.remove('hidden');
+                renderCalculator();
+            } else {
+                calcView.classList.add('hidden');
+                invView.classList.remove('hidden');
+                invTab.className = "flex-1 py-2 rounded-lg font-medium bg-white shadow-sm text-indigo-600";
+                calcTab.className = "flex-1 py-2 rounded-lg font-medium text-gray-500";
+                footer.classList.add('hidden');
+                loadManageList();
+            }
+        }
+
+        function searchItems(query) {
+            const resultsDiv = document.getElementById('search-results');
+            if (!query.trim()) {
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            const transaction = db.transaction(["prendas"], "readonly");
+            const store = transaction.objectStore("prendas");
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const items = request.result;
+                const filtered = items.filter(i => 
+                    i.name.toLowerCase().includes(query.toLowerCase()) || 
+                    (i.category && i.category.toLowerCase().includes(query.toLowerCase())) ||
+                    (i.size && i.size.toLowerCase().includes(query.toLowerCase()))
+                );
+
+                if (filtered.length > 0) {
+                    resultsDiv.classList.remove('hidden');
+                    resultsDiv.innerHTML = filtered.slice(0, 6).map(item => `
+                        <div onclick="addItemToCalculator(${item.id})" class="bg-white p-3 rounded-2xl border border-indigo-100 flex justify-between items-center active:bg-indigo-50 fade-in mb-1">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">${item.name}</p>
+                                <div class="flex gap-2">
+                                    <span class="text-[10px] text-indigo-500 font-bold uppercase">${item.category || 'General'}</span>
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase">Talla: ${item.size || '-'}</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs font-black text-indigo-600">${item.pricePts} pts</p>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    resultsDiv.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm bg-white rounded-2xl border-2 border-dashed">No hay coincidencias</div>';
+                    resultsDiv.classList.remove('hidden');
+                }
+            };
+        }
+
+        function addItemToCalculator(id) {
+            if (!selectedItems.has(id)) {
+                selectedItems.set(id, ""); 
+            }
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').classList.add('hidden');
+            renderCalculator();
+            
+            setTimeout(() => {
+                const input = document.querySelector(`input[data-id="${id}"]`);
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }, 100);
+        }
+
+        function renderCalculator() {
+            const container = document.getElementById('calculator-cart');
+            if (selectedItems.size === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-400 italic bg-white rounded-3xl border-2 border-dashed border-gray-200">
+                        Busca prendas arriba para añadir
+                    </div>`;
+                calculateTotal();
+                return;
+            }
+
+            const transaction = db.transaction(["prendas"], "readonly");
+            const store = transaction.objectStore("prendas");
+            container.innerHTML = '';
+            
+            selectedItems.forEach((qty, id) => {
+                const req = store.get(id);
+                req.onsuccess = () => {
+                    const item = req.result;
+                    if (!item) return;
+
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-4 rounded-2xl android-shadow flex justify-between items-center fade-in";
+                    div.innerHTML = `
+                        <div class="flex-1 min-w-0 pr-2">
+                            <h3 class="font-bold text-gray-800 text-sm truncate">${item.name}</h3>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                <span class="text-[9px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded font-bold uppercase">${item.category || 'Gral.'}</span>
+                                <span class="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-bold uppercase">Talla: ${item.size || '-'}</span>
+                            </div>
+                            <p class="text-indigo-600 font-black text-xs mt-1">${item.pricePts} pts</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex flex-col items-center">
+                                <span class="text-[8px] text-gray-400 font-bold uppercase mb-0.5">Cant.</span>
+                                <input type="number" 
+                                       data-id="${item.id}"
+                                       min="0" 
+                                       placeholder="0"
+                                       value="${qty}" 
+                                       oninput="updateQuantity(${item.id}, this.value)"
+                                       class="w-16 p-2 bg-gray-50 border border-gray-200 rounded-xl text-center font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500 outline-none ${qty === "" || qty === 0 ? 'input-empty' : ''}">
+                            </div>
+                            <button onclick="removeFromCalculator(${item.id})" class="p-2 text-red-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                    calculateTotal();
+                };
+            });
+        }
+
+        function updateQuantity(id, val) {
+            selectedItems.set(id, val === "" ? "" : parseInt(val));
+            calculateTotal();
+            const input = document.querySelector(`input[data-id="${id}"]`);
+            if (input) {
+                if (val === "" || parseInt(val) === 0) input.classList.add('input-empty');
+                else input.classList.remove('input-empty');
+            }
+        }
+
+        function removeFromCalculator(id) {
+            selectedItems.delete(id);
+            renderCalculator();
+        }
+
+        function clearCalculator() {
+            selectedItems.clear();
+            renderCalculator();
+        }
+
+        async function calculateTotal() {
+            let totalPts = 0;
+            const transaction = db.transaction(["prendas"], "readonly");
+            const store = transaction.objectStore("prendas");
+
+            for (let [id, qty] of selectedItems) {
+                const item = await new Promise(resolve => {
+                    const req = store.get(id);
+                    req.onsuccess = () => resolve(req.result);
+                });
+                const quantity = parseInt(qty) || 0;
+                if (item) totalPts += (item.pricePts * quantity);
+            }
+
+            const totalEur = totalPts / EURO_CONVERSION;
+            document.getElementById('total-price-pts').innerText = totalPts.toLocaleString('es-ES') + ' pts';
+            document.getElementById('total-price-eur').innerText = totalEur.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + '€';
+        }
+
+        // --- GESTIÓN DE INVENTARIO ---
+        function updateEuroPreview(pts) {
+            const val = parseFloat(pts) || 0;
+            if (val < 0) document.getElementById('input-price').value = 0;
+            const euro = (parseFloat(pts) || 0) / EURO_CONVERSION;
+            document.getElementById('euro-preview').innerText = `≈ ${euro.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €`;
+        }
+
+        function resetForm() {
+            document.getElementById('form-title').innerText = "Nueva Prenda";
+            document.getElementById('edit-id').value = "";
+            document.getElementById('input-name').value = "";
+            document.getElementById('input-category').value = "";
+            document.getElementById('input-size').value = "";
+            document.getElementById('input-price').value = "";
+            document.getElementById('euro-preview').innerText = "≈ 0.00 €";
+            document.getElementById('btn-save').innerText = "Guardar en Inventario";
+            document.getElementById('btn-cancel').classList.add('hidden');
+        }
+
+        function saveItem() {
+            const id = document.getElementById('edit-id').value;
+            const name = document.getElementById('input-name').value;
+            const category = document.getElementById('input-category').value;
+            const size = document.getElementById('input-size').value;
+            const pricePts = parseInt(document.getElementById('input-price').value);
+
+            if (!name || isNaN(pricePts) || pricePts < 0) {
+                alert("Introduce nombre y precio válido");
+                return;
+            }
+
+            const transaction = db.transaction(["prendas"], "readwrite");
+            const store = transaction.objectStore("prendas");
+            const itemData = { name, category, size, pricePts, date: new Date() };
+
+            if (id) {
+                itemData.id = parseInt(id);
+                store.put(itemData);
+            } else {
+                store.add(itemData);
+            }
+
+            transaction.oncomplete = () => {
+                resetForm();
+                loadManageList();
+            };
+        }
+
+        function loadManageList() {
+            const listContainer = document.getElementById('manage-list');
+            listContainer.innerHTML = '';
+            const transaction = db.transaction(["prendas"], "readonly");
+            const store = transaction.objectStore("prendas");
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                request.result.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center p-4 bg-white border border-gray-100 rounded-2xl android-shadow mb-2";
+                    div.innerHTML = `
+                        <div class="flex-1 truncate mr-2">
+                            <p class="text-sm font-bold text-gray-700 truncate">${item.name}</p>
+                            <div class="flex gap-1 text-[9px] font-bold text-gray-400 uppercase mt-0.5">
+                                <span>${item.category || 'Gral'}</span>
+                                <span>•</span>
+                                <span>Talla ${item.size || '-'}</span>
+                            </div>
+                            <p class="text-xs font-black text-indigo-600 mt-0.5">${item.pricePts} pts</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editItem(${item.id})" class="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl active:bg-indigo-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                            </button>
+                            <button onclick="deleteItem(${item.id})" class="p-2.5 bg-red-50 text-red-400 rounded-2xl active:bg-red-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    `;
+                    listContainer.appendChild(div);
+                });
+            };
+        }
+
+        function editItem(id) {
+            const transaction = db.transaction(["prendas"], "readonly");
+            const store = transaction.objectStore("prendas");
+            const req = store.get(id);
+            req.onsuccess = () => {
+                const item = req.result;
+                document.getElementById('form-title').innerText = "Editar Prenda";
+                document.getElementById('edit-id').value = item.id;
+                document.getElementById('input-name').value = item.name;
+                document.getElementById('input-category').value = item.category || "";
+                document.getElementById('input-size').value = item.size || "";
+                document.getElementById('input-price').value = item.pricePts;
+                document.getElementById('btn-save').innerText = "Guardar Cambios";
+                document.getElementById('btn-cancel').classList.remove('hidden');
+                updateEuroPreview(item.pricePts);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+        }
+
+        function deleteItem(id) {
+            if (confirm("¿Eliminar prenda definitivamente?")) {
+                const transaction = db.transaction(["prendas"], "readwrite");
+                transaction.objectStore("prendas").delete(id);
+                transaction.oncomplete = () => {
+                    loadManageList();
+                    if (selectedItems.has(id)) {
+                        selectedItems.delete(id);
+                        renderCalculator();
+                    }
+                };
+            }
+        }
+    </script>
+</body>
+</html>

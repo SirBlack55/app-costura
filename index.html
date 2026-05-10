@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -10,14 +11,15 @@
     <meta name="apple-mobile-web-app-title" content="Produccion">
     <title>Registro de Ropa - Xiaomi 11</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%234f46e5'/%3E%3Cpath d='M20 18h24v8H20zm2 10h20v18H22z' fill='white'/%3E%3Cpath d='M28 18v28M36 18v28' stroke='%234f46e5' stroke-width='3'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%234f46e5'/%3E%3Cpath d='M20 18h24v8H20zm2 10h20v18H22z' fill='white'/%3E%3Cpath d='M28 18v28M36 18v28' stroke='%234f46e5' stroke-width='3'/%3E%3C/svg%3E">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-        
+
         :root {
             color-scheme: light;
         }
-        
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
@@ -45,9 +47,17 @@
         .fade-in {
             animation: fadeIn 0.3s ease-out;
         }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-hidden {
@@ -61,7 +71,7 @@
             pointer-events: none;
             transform: translateY(110%);
         }
-        
+
         /* Estilo para los divisores de fecha en el historial */
         .date-header {
             position: sticky;
@@ -72,30 +82,40 @@
         }
     </style>
 </head>
+
 <body class="min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-indigo-600 text-white p-6 rounded-b-[2.5rem] android-shadow flex justify-between items-center safe-area-top">
+    <header
+        class="bg-indigo-600 text-white p-6 rounded-b-[2.5rem] android-shadow flex justify-between items-center safe-area-top">
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">Producción</h1>
             <p id="header-subtitle" class="text-indigo-100 text-xs font-medium uppercase tracking-wider">Cargando...</p>
         </div>
-        <button onclick="toggleSettings(true)" class="p-2.5 bg-white/10 rounded-2xl active:scale-90 transition-transform">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <button onclick="toggleSettings(true)"
+            class="p-2.5 bg-white/10 rounded-2xl active:scale-90 transition-transform">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
         </button>
     </header>
 
     <!-- Modal de Ajustes -->
-    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/60 modal-hidden transition-all duration-300" onclick="toggleSettings(false)">
+    <div id="settings-modal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/60 modal-hidden transition-all duration-300"
+        onclick="toggleSettings(false)">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 android-shadow" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-slate-800">Ajustes</h2>
                 <button onclick="toggleSettings(false)" class="text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -104,47 +124,63 @@
                 <div class="p-5 bg-indigo-50 rounded-3xl border border-indigo-100">
                     <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-3">Backup</h3>
                     <div class="grid grid-cols-1 gap-2">
-                        <button onclick="exportData()" class="flex items-center justify-center gap-2 w-full py-3.5 bg-white border border-indigo-200 text-indigo-600 rounded-2xl font-bold active:scale-95 transition-transform">
+                        <button onclick="exportData()"
+                            class="flex items-center justify-center gap-2 w-full py-3.5 bg-white border border-indigo-200 text-indigo-600 rounded-2xl font-bold active:scale-95 transition-transform">
                             Exportar (.json)
                         </button>
-                        <label class="flex items-center justify-center gap-2 w-full py-3.5 bg-indigo-600 text-white rounded-2xl font-bold active:scale-95 transition-transform cursor-pointer text-center">
+                        <label
+                            class="flex items-center justify-center gap-2 w-full py-3.5 bg-indigo-600 text-white rounded-2xl font-bold active:scale-95 transition-transform cursor-pointer text-center">
                             Importar Datos
-                            <input type="file" id="import-file" class="hidden" accept=".json" onchange="importData(event)">
+                            <input type="file" id="import-file" class="hidden" accept=".json"
+                                onchange="importData(event)">
                         </label>
                     </div>
                 </div>
 
                 <div class="p-5 bg-rose-50 rounded-3xl border border-rose-100">
                     <h3 class="text-xs font-black text-rose-600 uppercase tracking-widest mb-3">Peligro</h3>
-                    <button onclick="clearAllHistory()" class="text-xs text-rose-500 font-bold border border-rose-200 w-full py-3 rounded-2xl bg-white active:bg-rose-50">Vaciar Historial</button>
+                    <button onclick="clearAllHistory()"
+                        class="text-xs text-rose-500 font-bold border border-rose-200 w-full py-3 rounded-2xl bg-white active:bg-rose-50">Vaciar
+                        Historial</button>
                 </div>
-                
-                <p class="text-[10px] text-slate-400 text-center font-bold tracking-tighter">APP VER 3.5 • Xiaomi 11 optimized</p>
+
+                <p class="text-[10px] text-slate-400 text-center font-bold tracking-tighter">APP VER 3.5 • Xiaomi 11
+                    optimized</p>
             </div>
         </div>
     </div>
 
     <!-- Main Content -->
     <main class="flex-1 p-4 pb-48">
-        
+
         <!-- Tabs -->
         <div class="flex bg-slate-200/50 p-1 rounded-2xl mb-6">
-            <button id="tab-calculator" onclick="switchTab('calculator')" class="flex-1 py-3 rounded-[14px] font-bold text-sm bg-white shadow-sm text-indigo-600 transition-all">Registrar</button>
-            <button id="tab-history" onclick="switchTab('history')" class="flex-1 py-3 rounded-[14px] font-bold text-sm text-slate-500 transition-all">Historial</button>
-            <button id="tab-inventory" onclick="switchTab('inventory')" class="flex-1 py-3 rounded-[14px] font-bold text-sm text-slate-500 transition-all">Prendas</button>
+            <button id="tab-calculator" onclick="switchTab('calculator')"
+                class="flex-1 py-3 rounded-[14px] font-bold text-sm bg-white shadow-sm text-indigo-600 transition-all">Registrar</button>
+            <button id="tab-history" onclick="switchTab('history')"
+                class="flex-1 py-3 rounded-[14px] font-bold text-sm text-slate-500 transition-all">Historial</button>
+            <button id="tab-inventory" onclick="switchTab('inventory')"
+                class="flex-1 py-3 rounded-[14px] font-bold text-sm text-slate-500 transition-all">Prendas</button>
         </div>
 
         <!-- Vista: Registrar -->
         <section id="view-calculator" class="space-y-5">
             <div class="bg-indigo-600 p-5 rounded-[2rem] shadow-xl shadow-indigo-200">
-                <label class="text-[10px] font-black text-indigo-200 uppercase tracking-[0.2em] block mb-2 ml-1">Fecha de trabajo</label>
-                <input type="date" id="work-date" class="w-full bg-indigo-500/50 border border-indigo-400/30 rounded-2xl p-4 text-lg font-bold text-white outline-none focus:bg-indigo-500" autocomplete="off">
+                <label class="text-[10px] font-black text-indigo-200 uppercase tracking-[0.2em] block mb-2 ml-1">Fecha
+                    de trabajo</label>
+                <input type="date" id="work-date"
+                    class="w-full bg-indigo-500/50 border border-indigo-400/30 rounded-2xl p-4 text-lg font-bold text-white outline-none focus:bg-indigo-500"
+                    autocomplete="off">
             </div>
 
             <div class="relative">
-                <input type="text" id="search-input" oninput="searchItems(this.value)" placeholder="Buscar tipo de prenda..." class="w-full p-5 pl-14 bg-white border-none rounded-[1.5rem] android-shadow focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-5 top-5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <input type="text" id="search-input" oninput="searchItems(this.value)"
+                    placeholder="Buscar tipo de prenda..."
+                    class="w-full p-5 pl-14 bg-white border-none rounded-[1.5rem] android-shadow focus:ring-2 focus:ring-indigo-500 outline-none text-slate-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 absolute left-5 top-5 text-slate-300" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
 
@@ -160,46 +196,66 @@
 
             <div class="flex justify-between items-center pt-4">
                 <h2 class="text-xl font-extrabold text-slate-800">Cola de registro</h2>
-                <button onclick="clearDrafts()" class="text-[10px] text-slate-400 font-black uppercase tracking-widest px-3 py-1">Limpiar</button>
+                <button onclick="clearDrafts()"
+                    class="text-[10px] text-slate-400 font-black uppercase tracking-widest px-3 py-1">Limpiar</button>
             </div>
-            
+
             <div id="calculator-drafts" class="space-y-4"></div>
         </section>
 
         <!-- Vista: Historial (Rediseñada) -->
         <section id="view-history" class="hidden space-y-6">
-            <div class="flex items-center justify-between bg-white p-4 rounded-3xl android-shadow border border-slate-100">
+            <div
+                class="flex items-center justify-between bg-white p-4 rounded-3xl android-shadow border border-slate-100">
                 <span class="text-xs font-black text-slate-400 uppercase tracking-widest ml-2">Mes de consulta</span>
-                <input type="month" id="month-filter" onchange="updateView()" class="bg-slate-50 border-none rounded-xl p-2.5 text-sm font-bold text-indigo-600 outline-none" autocomplete="off">
+                <input type="month" id="month-filter" onchange="updateView()"
+                    class="bg-slate-50 border-none rounded-xl p-2.5 text-sm font-bold text-indigo-600 outline-none"
+                    autocomplete="off">
             </div>
-            
-            <div id="history-edit-panel" class="hidden bg-white p-5 rounded-[2rem] android-shadow border border-slate-100 space-y-4">
+
+            <div id="history-edit-panel"
+                class="hidden bg-white p-5 rounded-[2rem] android-shadow border border-slate-100 space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-extrabold text-slate-800">Editar registro</h3>
                     <button onclick="cancelHistoryEdit()" class="text-slate-400 font-bold px-2 py-1">X</button>
                 </div>
                 <input type="hidden" id="history-edit-id" value="">
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Prenda</label>
-                    <input type="text" id="history-edit-name" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none font-semibold" autocomplete="off">
+                    <label
+                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Prenda</label>
+                    <input type="text" id="history-edit-name"
+                        class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 outline-none font-semibold"
+                        autocomplete="off">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Precio</label>
-                        <input type="text" id="history-edit-price" inputmode="decimal" class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold outline-none" autocomplete="off">
+                        <label
+                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Precio</label>
+                        <input type="text" id="history-edit-price" inputmode="decimal"
+                            class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold outline-none"
+                            autocomplete="off">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Cantidad</label>
-                        <input type="number" id="history-edit-qty" min="1" inputmode="numeric" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 text-slate-700 font-bold outline-none" autocomplete="off">
+                        <label
+                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Cantidad</label>
+                        <input type="number" id="history-edit-qty" min="1" inputmode="numeric"
+                            class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 text-slate-700 font-bold outline-none"
+                            autocomplete="off">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Fecha</label>
-                    <input type="datetime-local" id="history-edit-date" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 text-slate-700 font-bold outline-none" autocomplete="off">
+                    <label
+                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Fecha</label>
+                    <input type="datetime-local" id="history-edit-date"
+                        class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 text-slate-700 font-bold outline-none"
+                        autocomplete="off">
                 </div>
                 <div class="flex gap-2 pt-1">
-                    <button onclick="saveHistoryEdit()" class="flex-1 bg-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-transform">GUARDAR CAMBIOS</button>
-                    <button onclick="cancelHistoryEdit()" class="bg-slate-100 text-slate-500 font-bold px-6 py-4 rounded-2xl">CANCELAR</button>
+                    <button onclick="saveHistoryEdit()"
+                        class="flex-1 bg-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-transform">GUARDAR
+                        CAMBIOS</button>
+                    <button onclick="cancelHistoryEdit()"
+                        class="bg-slate-100 text-slate-500 font-bold px-6 py-4 rounded-2xl">CANCELAR</button>
                 </div>
             </div>
 
@@ -213,23 +269,33 @@
             <div class="bg-white p-6 rounded-[2rem] android-shadow border border-slate-50 space-y-5">
                 <h2 id="form-title" class="text-lg font-extrabold text-slate-800">Nueva Prenda</h2>
                 <input type="hidden" id="edit-id" value="">
-                
+
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Tipo de prenda</label>
-                        <input type="text" id="input-name" placeholder="Ej: Polo Azul" class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold" autocomplete="off" autocapitalize="words">
+                        <label
+                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Tipo
+                            de prenda</label>
+                        <input type="text" id="input-name" placeholder="Ej: Polo Azul"
+                            class="w-full p-4 bg-slate-50 rounded-2xl border border-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none font-semibold"
+                            autocomplete="off" autocapitalize="words">
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Precio Unitario (Pesetas)</label>
-                        <input type="text" id="input-price" inputmode="decimal" oninput="updateEuroPreview(this.value)" class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold text-xl outline-none" autocomplete="off">
+                        <label
+                            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Precio
+                            Unitario (Pesetas)</label>
+                        <input type="text" id="input-price" inputmode="decimal" oninput="updateEuroPreview(this.value)"
+                            class="w-full p-4 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-600 font-bold text-xl outline-none"
+                            autocomplete="off">
                         <p id="euro-preview" class="mt-2 text-sm text-indigo-400 font-medium italic">≈ 0,00 €</p>
                     </div>
                 </div>
 
                 <div class="flex gap-2 pt-2">
-                    <button id="btn-save" onclick="saveItem()" class="flex-1 bg-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-transform">GUARDAR</button>
-                    <button id="btn-cancel" onclick="resetForm()" class="hidden bg-slate-100 text-slate-500 font-bold px-6 py-4 rounded-2xl">X</button>
+                    <button id="btn-save" onclick="saveItem()"
+                        class="flex-1 bg-indigo-600 text-white font-black py-4 rounded-2xl active:scale-95 transition-transform">GUARDAR</button>
+                    <button id="btn-cancel" onclick="resetForm()"
+                        class="hidden bg-slate-100 text-slate-500 font-bold px-6 py-4 rounded-2xl">X</button>
                 </div>
             </div>
 
@@ -242,7 +308,8 @@
     </main>
 
     <!-- Total Footer -->
-    <footer id="total-footer" class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-100 p-6 rounded-t-[2.5rem] shadow-[0_-10px_30px_rgba(0,0,0,0.05)] safe-area-bottom">
+    <footer id="total-footer"
+        class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-100 p-6 rounded-t-[2.5rem] shadow-[0_-10px_30px_rgba(0,0,0,0.05)] safe-area-bottom">
         <div class="max-w-md mx-auto grid grid-cols-2 gap-6">
             <div>
                 <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.15em] mb-1">Total Pesetas</p>
@@ -547,7 +614,7 @@
             if (!dateStr) return alert("Selecciona fecha");
             const cantidad = parseQty(item.qty);
             if (cantidad < 1) return alert("Introduce una cantidad mayor que 0");
-            
+
             const now = new Date();
             const date = new Date(dateStr);
             date.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
@@ -617,71 +684,89 @@
             };
         }
 
-        // --- HISTORIAL AGRUPADO ---
+        // --- HISTORIAL AGRUPADO ACTUALIZADO ---
         function renderHistoryGrouped() {
             const container = document.getElementById('history-grouped-list');
             container.innerHTML = '<div class="text-center py-20 text-slate-400 font-medium">Buscando registros...</div>';
-            
-            const monthVal = document.getElementById('month-filter').value; 
+
+            const monthVal = document.getElementById('month-filter').value;
             db.transaction("historial").objectStore("historial").getAll().onsuccess = (e) => {
                 const filtered = e.target.result.filter(entry => formatLocalMonth(new Date(entry.fecha)) === monthVal)
-                                  .sort((a, b) => b.fecha - a.fecha);
+                    .sort((a, b) => b.fecha - a.fecha);
 
                 if (filtered.length === 0) {
                     container.innerHTML = '<div class="text-center py-20 text-slate-400 font-medium italic">No hay nada anotado en este mes</div>';
                     return;
                 }
 
-                // Agrupar por fecha local
+                // Agrupar por fecha y calcular totales diarios
                 const groups = {};
                 filtered.forEach(entry => {
                     const dateObj = new Date(entry.fecha);
                     const dateKey = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    // Capitalizar primera letra (Viernes...)
                     const formattedKey = dateKey.charAt(0).toUpperCase() + dateKey.slice(1);
-                    if (!groups[formattedKey]) groups[formattedKey] = [];
-                    groups[formattedKey].push(entry);
+
+                    if (!groups[formattedKey]) {
+                        groups[formattedKey] = {
+                            items: [],
+                            totalDiaPts: 0
+                        };
+                    }
+
+                    groups[formattedKey].items.push(entry);
+                    groups[formattedKey].totalDiaPts += (entry.totalPts || 0);
                 });
 
-                container.innerHTML = Object.keys(groups).map(dateTitle => `
-                    <div class="space-y-4">
-                        <div class="date-header py-2">
-                            <h3 class="text-sm font-black text-indigo-600 uppercase tracking-widest pl-2 border-l-4 border-indigo-500">${escapeHtml(dateTitle)}</h3>
-                        </div>
-                        <div class="space-y-3">
-                            ${groups[dateTitle].map(entry => `
-                                <div class="bg-white p-4 rounded-2xl android-shadow border border-slate-50 flex justify-between items-center fade-in">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2">
-                                            <h4 class="font-bold text-slate-800">${escapeHtml(entry.nombre)}</h4>
-                                        </div>
-                                        <p class="text-[10px] text-slate-400 font-bold mt-1">
-                                            PRECIO <span class="text-slate-600">${escapeHtml(formatPts(entry.precioUnitario))} pts</span> •
-                                            CANT <span class="text-slate-600">${escapeHtml(entry.cantidad || 1)}</span>
-                                        </p>
-                                    </div>
-                                    <div class="text-right flex items-center gap-4">
-                                        <div>
-                                            <p class="text-base font-black text-emerald-500">${escapeHtml(formatPts(entry.totalPts))} pts</p>
-                                            <p class="text-[9px] text-slate-300 font-bold uppercase">${escapeHtml(new Date(entry.fecha).toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'}))}</p>
-                                        </div>
-                                        <button onclick="editHistoryEntry(${entry.id})" class="text-slate-300 active:text-indigo-500 p-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                        </button>
-                                        <button onclick="deleteHistoryEntry(${entry.id})" class="text-slate-200 active:text-rose-400 p-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            `).join('')}
+                container.innerHTML = Object.keys(groups).map(dateTitle => {
+                    const totalPts = groups[dateTitle].totalDiaPts;
+                    // Cálculo de euros (asumiendo 1€ = 166.386 pts o la tasa que uses)
+                    const totalEuros = (totalPts / 166.386).toFixed(3);
+
+                    return `
+                <div class="space-y-4 mb-6">
+                    <div class="date-header py-2 flex justify-between items-end border-l-4 border-indigo-500 pl-3">
+                        <div>
+                            <h3 class="text-sm font-black text-indigo-600 uppercase tracking-widest">${escapeHtml(dateTitle)}</h3>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase mt-0.5">
+                                Total día: <span class="text-indigo-400">${formatPts(totalPts)} pts</span> 
+                                <span class="mx-1 text-slate-300">•</span> 
+                                <span class="text-emerald-500">${totalEuros}€</span>
+                            </p>
                         </div>
                     </div>
-                `).join('');
+                    <div class="space-y-3">
+                        ${groups[dateTitle].items.map(entry => `
+                            <div class="bg-white p-4 rounded-2xl android-shadow border border-slate-50 flex justify-between items-center fade-in">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-slate-800">${escapeHtml(entry.nombre)}</h4>
+                                    <p class="text-[10px] text-slate-400 font-bold mt-1">
+                                        PRECIO <span class="text-slate-600">${escapeHtml(formatPts(entry.precioUnitario))} pts</span> •
+                                        CANT <span class="text-slate-600">${escapeHtml(entry.cantidad || 1)}</span>
+                                    </p>
+                                </div>
+                                <div class="text-right flex items-center gap-4">
+                                    <div>
+                                        <p class="text-base font-black text-emerald-500">${escapeHtml(formatPts(entry.totalPts))} pts</p>
+                                        <p class="text-[9px] text-slate-300 font-bold uppercase">${escapeHtml(new Date(entry.fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }))}</p>
+                                    </div>
+                                    <button onclick="editHistoryEntry(${entry.id})" class="text-slate-300 active:text-indigo-500 p-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                    </button>
+                                    <button onclick="deleteHistoryEntry(${entry.id})" class="text-slate-200 active:text-rose-400 p-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+                }).join('');
             };
         }
 
         function deleteHistoryEntry(id) {
-            if(confirm("¿Borrar registro de este día?")) {
+            if (confirm("¿Borrar registro de este día?")) {
                 db.transaction("historial", "readwrite").objectStore("historial").delete(id);
                 renderHistoryGrouped();
                 calculateMonthlyTotal();
@@ -698,14 +783,14 @@
                 document.getElementById('total-price-pts').innerText = formatPts(totalPts) + ' pts';
                 document.getElementById('total-price-eur').innerText = totalEur.toLocaleString('es-ES', { minimumFractionDigits: 2 }) + '€';
                 const [year, month] = monthVal.split('-');
-                const monthName = new Date(year, month-1).toLocaleString('es-ES', { month: 'long' });
+                const monthName = new Date(year, month - 1).toLocaleString('es-ES', { month: 'long' });
                 document.getElementById('header-subtitle').innerText = `${monthName.toUpperCase()} ${year}`;
             };
         }
 
         // --- BACKUP ---
         function clearAllHistory() {
-            if(confirm("CUIDADO: Se borrará todo el historial. ¿Confirmar?")) {
+            if (confirm("CUIDADO: Se borrará todo el historial. ¿Confirmar?")) {
                 const tx = db.transaction("historial", "readwrite");
                 tx.objectStore("historial").clear();
                 tx.oncomplete = () => { updateView(); toggleSettings(false); };
@@ -748,4 +833,5 @@
         }
     </script>
 </body>
+
 </html>

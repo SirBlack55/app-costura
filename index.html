@@ -365,6 +365,18 @@
         }
 
         function parseQty(value) {
+            // Intentar evaluar si es una operación matemática (ej: 5+5)
+            if (typeof value === 'string' && /[+\-*/]/.test(value)) {
+                try {
+                    // Limpiamos el valor de caracteres extraños y evaluamos
+                    const cleanValue = value.replace(/[^0-9+\-*/.]/g, '');
+                    const result = Function('"use strict";return (' + cleanValue + ')')();
+                    return Number.isFinite(result) && result > 0 ? Math.floor(result) : 0;
+                } catch (e) {
+                    const qty = parseInt(value, 10);
+                    return Number.isFinite(qty) && qty > 0 ? qty : 0;
+                }
+            }
             const qty = parseInt(value, 10);
             return Number.isFinite(qty) && qty > 0 ? qty : 0;
         }
@@ -590,12 +602,29 @@
                         </button>
                     </div>
                     <div class="bg-slate-50 p-3 rounded-2xl mb-4">
-                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 text-center">Cantidad</label>
-                        <input type="number" min="1" inputmode="numeric" oninput="updateDraft(${item.draftId}, 'qty', this.value)" value="${escapeHtml(item.qty)}" placeholder="0" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 text-center">Cantidad (puedes sumar ej: 5+5)</label>
+                        <input type="text" inputmode="decimal" onchange="handleQtyChange(this, ${item.draftId})" value="${escapeHtml(item.qty)}" placeholder="0" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">  
                     </div>
                     <button onclick="commitRecord(${item.draftId})" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-100">REGISTRAR</button>
                 </div>
             `).join('');
+        }
+
+        function handleQtyChange(input, draftId) {
+            const rawValue = input.value.trim();
+            if (/[+\-*/]/.test(rawValue)) {
+                try {
+                    const cleanValue = rawValue.replace(/[^0-9+\-*/.]/g, '');
+                    const result = Function('"use strict";return (' + cleanValue + ')')();
+                    if (Number.isFinite(result) && result > 0) {
+                        const finalVal = Math.floor(result);
+                        input.value = finalVal;
+                        updateDraft(draftId, 'qty', finalVal);
+                        return;
+                    }
+                } catch (e) { }
+            }
+            updateDraft(draftId, 'qty', rawValue);
         }
 
         function updateDraft(id, field, value) {

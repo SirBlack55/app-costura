@@ -603,7 +603,7 @@
                     </div>
                     <div class="bg-slate-50 p-3 rounded-2xl mb-4">
                         <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 text-center">Cantidad (puedes sumar ej: 5+5)</label>
-                        <input type="text" inputmode="decimal" onchange="handleQtyChange(this, ${item.draftId})" value="${escapeHtml(item.qty)}" placeholder="0" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">  
+                        <input type="text" inputmode="text" onchange="handleQtyChange(this, ${item.draftId})" value="${escapeHtml(item.qty)}" placeholder="0" class="w-full bg-transparent p-0 text-lg font-black text-indigo-600 outline-none text-center" autocomplete="off">  
                     </div>
                     <button onclick="commitRecord(${item.draftId})" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-sm tracking-widest active:scale-95 transition-transform shadow-lg shadow-indigo-100">REGISTRAR</button>
                 </div>
